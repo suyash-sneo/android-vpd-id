@@ -8,31 +8,24 @@ import android.provider.Settings;
 
 import androidx.annotation.Nullable;
 
+import com.device.id.virtual.binders.LocalBinder;
+
+import java.util.Random;
+
 public class IdProviderService extends Service {
 
-    private MediaPlayer player;
+    // Binder for the clients
+    private final IBinder binder = new LocalBinder(IdProviderService.this);
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-
-        player = MediaPlayer.create(this, Settings.System.DEFAULT_RINGTONE_URI);
-        player.setLooping(true);
-        player.start();
-
-        return START_STICKY;
-    }
-
-    @Override
-    public void onDestroy() {
-
-        super.onDestroy();
-
-        player.stop();
-    }
+    private final Random mGenerator = new Random();
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return binder;
+    }
+
+    public int getRandomNumber() {
+        return mGenerator.nextInt();
     }
 }
