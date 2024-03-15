@@ -2,10 +2,13 @@ package com.device.id.virtual;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.View;
@@ -14,6 +17,7 @@ import android.widget.Toast;
 
 import com.device.id.virtual.binders.LocalBinder;
 import com.device.id.virtual.services.IdProviderService;
+import com.device.id.virtual.services.SecretKeyService;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,6 +37,19 @@ public class MainActivity extends AppCompatActivity {
 
         initializeViews();
         setupListeners();
+
+        createNotificationChannel();
+    }
+
+    private void createNotificationChannel() {
+        CharSequence name = "ID Request Notifications";
+        String description = "ID Requests from applications will prompt a notification in this channel";
+        int importance = NotificationManager.IMPORTANCE_HIGH;
+        NotificationChannel channel = new NotificationChannel("id-req-notify", name, importance);
+        channel.setDescription(description);
+
+        NotificationManager notificationManager = getSystemService(NotificationManager.class);
+        notificationManager.createNotificationChannel(channel);
     }
 
     private void initializeViews() {
@@ -46,8 +63,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (mBound) {
-                    int num = service.getRandomNumber();
-                    Toast.makeText(MainActivity.this, "Number: " + num, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Start clicked", Toast.LENGTH_SHORT).show();
+                    String s = service.getId("test.123@gmail.com");
+                    System.out.println(s);
+                    Toast.makeText(MainActivity.this, "Id: " + s, Toast.LENGTH_SHORT).show();
                 }
             }
         });
