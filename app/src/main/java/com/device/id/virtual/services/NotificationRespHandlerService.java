@@ -1,5 +1,6 @@
 package com.device.id.virtual.services;
 
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
@@ -45,12 +46,6 @@ public class NotificationRespHandlerService extends Service {
         String action = intent.getAction();
         System.out.println("Notification handler started with action: " + action);
 
-        if(service==null) {
-            Log.e(TAG, "Id Provider Service reference is null");
-        } else {
-            this.action = action;
-        }
-
         if(action == null) {
 
         } else if(action.equals("approve")) {
@@ -59,7 +54,8 @@ public class NotificationRespHandlerService extends Service {
 
         }
 
-        // stopSelf();
+        NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.cancel(0);
 
         return super.onStartCommand(intent, flags, startId);
     }
