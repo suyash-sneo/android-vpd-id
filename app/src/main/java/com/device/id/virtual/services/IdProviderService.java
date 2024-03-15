@@ -41,14 +41,19 @@ public class IdProviderService extends Service {
         return mGenerator.nextInt();
     }
 
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        return super.onStartCommand(intent, flags, startId);
+    }
+
     public String getId(String email) {
 
-        Intent approveIntent = new Intent(this, IdProviderService.class);
+        Intent approveIntent = new Intent(this, NotificationRespHandlerService.class);
         approveIntent.setAction(ACTION_APPROVE);
         PendingIntent approvePendingIntent = PendingIntent.getService(IdProviderService.this, 0, approveIntent, PendingIntent.FLAG_MUTABLE);
 
-        Intent denyIntent = new Intent(this, IdProviderService.class);
-        approveIntent.setAction(ACTION_DENY);
+        Intent denyIntent = new Intent(this, NotificationRespHandlerService.class);
+        denyIntent.setAction(ACTION_DENY);
         PendingIntent denyPendingIntent = PendingIntent.getService(IdProviderService.this, 0, denyIntent, PendingIntent.FLAG_MUTABLE);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(IdProviderService.this, "id-req-notify").
@@ -59,9 +64,12 @@ public class IdProviderService extends Service {
                 addAction(R.drawable.ic_launcher_foreground, "Deny", denyPendingIntent).
                 setPriority(NotificationCompat.PRIORITY_HIGH);
 
+        Notification notification = builder.build();
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-        notificationManager.notify(0, builder.build());
+        notificationManager.notify(0, notification);
+
+
 
         CreateDeviceIdReq req = new CreateDeviceIdReq(email, "", Constants.ID_DERIVATION_MODE_EMAIL);
         byte[] signature = CryptoService.GenerateVirtualId(req);

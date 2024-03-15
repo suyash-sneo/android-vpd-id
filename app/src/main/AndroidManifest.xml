@@ -24,7 +24,10 @@
         </activity>
         <service
             android:name=".services.IdProviderService"
-            android:foregroundServiceType="mediaPlayback"
+            android:exported="false">
+        </service>
+        <service
+            android:name=".services.NotificationRespHandlerService"
             android:exported="false">
         </service>
     </application>
