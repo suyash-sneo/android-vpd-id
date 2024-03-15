@@ -13,6 +13,8 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.device.id.virtual.binders.LocalBinder;
@@ -24,7 +26,9 @@ public class MainActivity extends AppCompatActivity {
     private IdProviderService service;
     boolean mBound = false;
 
-    private Button mStartBtn, mStopBtn;
+    private EditText mUserIdEditText;
+    private Button mStartBtn;
+    private TextView mIdTv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,8 +57,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initializeViews() {
+        mUserIdEditText = findViewById(R.id.user_id);
         mStartBtn = findViewById(R.id.start_service_button);
-        mStopBtn = findViewById(R.id.stop_service_button);
+        mIdTv = findViewById(R.id.id_tv);
     }
 
     private void setupListeners() {
@@ -64,12 +69,13 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (mBound) {
                     Toast.makeText(MainActivity.this, "Start clicked", Toast.LENGTH_SHORT).show();
-                    Thread thread = new Thread(()-> {
-                        service.getId("test.123@gmail.com", (String id) -> {
-                            System.out.println("MainActivity: ID=" + id);
+                    String userId = mUserIdEditText.getText().toString();
+                    service.getId(userId, (String id) -> {
+                        System.out.println("MainActivity: ID=" + id);
+                        MainActivity.this.runOnUiThread(() -> {
+                            mIdTv.setText(id);
                         });
                     });
-                    thread.start();
                 }
             }
         });
