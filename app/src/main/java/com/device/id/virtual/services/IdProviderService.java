@@ -5,17 +5,22 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.IBinder;
 import android.provider.Settings;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 
+import com.device.id.virtual.ApplicationClass;
 import com.device.id.virtual.R;
 import com.device.id.virtual.binders.LocalBinder;
 import com.device.id.virtual.constants.Constants;
+import com.device.id.virtual.interfaces.IdGeneratedResultHandler;
 import com.device.id.virtual.models.CreateDeviceIdReq;
+import com.device.id.virtual.utils.TinyDB;
 
 import java.util.Arrays;
 import java.util.Base64;
@@ -25,11 +30,21 @@ public class IdProviderService extends Service {
 
     // Binder for the clients
     private final IBinder binder = new LocalBinder(IdProviderService.this);
+    private TinyDB tinyDB;
 
-    private final Random mGenerator = new Random();
+    private IdGeneratedResultHandler idHandler;
+    CreateDeviceIdReq devIdReq;
+
+    protected static final String TAG = "IdProviderService";
 
     private final String ACTION_APPROVE = "approve";
     private final String ACTION_DENY = "deny";
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        tinyDB = ApplicationClass.getTinyDBInstance(IdProviderService.this);
+    }
 
     @Nullable
     @Override
@@ -37,16 +52,26 @@ public class IdProviderService extends Service {
         return binder;
     }
 
-    public int getRandomNumber() {
-        return mGenerator.nextInt();
-    }
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         return super.onStartCommand(intent, flags, startId);
     }
 
-    public String getId(String email) {
+    public void updateNotificationAction(int notificationId, String action) {
+        if(idHandler==null) {
+            Log.e(TAG, "idHandler is null");
+        } else {
+            byte[] signature = CryptoService.GenerateVirtualId(devIdReq);
+
+            byte[] id = Arrays.copyOf(signature, 28);
+            System.out.println(Arrays.toString(id));
+            idHandler.run(Base64.getEncoder().encodeToString(id));
+        }
+    }
+
+    public void getId(String email, IdGeneratedResultHandler handler) {
+
+        idHandler = handler;
 
         Intent approveIntent = new Intent(this, NotificationRespHandlerService.class);
         approveIntent.setAction(ACTION_APPROVE);
@@ -69,13 +94,6 @@ public class IdProviderService extends Service {
         NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         notificationManager.notify(0, notification);
 
-
-
-        CreateDeviceIdReq req = new CreateDeviceIdReq(email, "", Constants.ID_DERIVATION_MODE_EMAIL);
-        byte[] signature = CryptoService.GenerateVirtualId(req);
-
-        byte[] id = Arrays.copyOf(signature, 28);
-        System.out.println(Arrays.toString(id));
-        return Base64.getEncoder().encodeToString(id);
+        devIdReq = new CreateDeviceIdReq(email, "", Constants.ID_DERIVATION_MODE_EMAIL);
     }
 }

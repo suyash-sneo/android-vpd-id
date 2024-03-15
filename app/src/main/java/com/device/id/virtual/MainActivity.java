@@ -64,9 +64,12 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if (mBound) {
                     Toast.makeText(MainActivity.this, "Start clicked", Toast.LENGTH_SHORT).show();
-                    String s = service.getId("test.123@gmail.com");
-                    System.out.println(s);
-                    Toast.makeText(MainActivity.this, "Id: " + s, Toast.LENGTH_SHORT).show();
+                    Thread thread = new Thread(()-> {
+                        service.getId("test.123@gmail.com", (String id) -> {
+                            System.out.println("MainActivity: ID=" + id);
+                        });
+                    });
+                    thread.start();
                 }
             }
         });
