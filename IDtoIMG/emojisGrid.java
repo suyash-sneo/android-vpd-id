@@ -12,7 +12,7 @@ import java.util.List;
 public class emojisGrid
 {
     // Unique ID
-    private static final String id = "AE8Hr/tnoH1wVpdX202dNy8Hipm0dEYTMgzPfB=1";
+    private static final String id = "AE8Hr/tnoH1wVpdX202dNy8Hipm0dEYTMgzPfB==";
 
     public static void main(String[] args)
     {
@@ -40,30 +40,49 @@ public class emojisGrid
         int padding = 10;
         int emojiWidth = (canvasWidth - padding * (gridSize + 1)) / gridSize;
         int emojiHeight = (canvasHeight - padding * (gridSize + 1)) / gridSize;
+        List<String> emojisUsed = new ArrayList<String>();
 
         // Seed random generator with hashed ID
         Random random = new Random(id.hashCode());
 
         for (int row = 0; row < gridSize; row++)
         {
-            for (int col = 0; col < gridSize; col++)
+            for (int col = 0; col < gridSize; col++) 
             {
-                String emoji = emojis.get(random.nextInt(emojis.size()));
-        
-                try {
+                // Get emoji and ensure no repeat emoji is being used
+                String emoji = "";
+                while(true)
+                {
+                    emoji = emojis.get(random.nextInt(emojis.size()));
+                    if (!emojisUsed.contains(emoji))
+                    {
+                        emojisUsed.add(emoji);
+                        break;
+                    }
+
+                }
+
+                try
+                {
                     // Load the image from URL using ImageIO.read
                     BufferedImage img = ImageIO.read(new URL(emoji));
-        
+
                     // Check if image is loaded successfully
-                    if (img != null) {
+                    if (img != null)
+                    {
                         int x = padding + col * (emojiWidth + padding);
                         int y = padding + row * (emojiHeight + padding);
-                        //System.out.println("Drawing emoji at coordinates: (" + x + ", " + y + ") - URL: " + emoji);
+                        // System.out.println("Drawing emoji at coordinates: (" + x + ", " + y + ") -
+                        // URL: " + emoji);
                         graphics.drawImage(img, x, y, emojiWidth, emojiHeight, null);
-                    } else {
+                    }
+                    else 
+                {
                         System.err.println("Failed to load image: " + emoji);
                     }
-                } catch (IOException e) {
+                }
+                catch (IOException e)
+                {
                     e.printStackTrace();
                     System.err.println("Error loading image: " + emoji);
                 }
@@ -87,12 +106,12 @@ public class emojisGrid
         {
             URL url = new URL("https://api.github.com/emojis");
             String response = new String(url.openConnection().getInputStream().readAllBytes());
-            //System.out.println("\nResponse: " + response);
+            // System.out.println("\nResponse: " + response);
             JSONObject data = new JSONObject(response);
-            //System.out.println("\n\nDATA: " + data);
+            // System.out.println("\n\nDATA: " + data);
             for (String key : data.keySet())
             {
-                //System.out.println("\n\nEmoji: " + data.getString(key));
+                // System.out.println("\n\nEmoji: " + data.getString(key));
                 emojis.add(data.getString(key));
             }
         }
@@ -114,6 +133,10 @@ java -cp "C:\Users\suhas\OneDrive\Documents\Code\Projects\IDtoIMG\scripts\lib\js
 
 Laptop:
 
+Compile Code:
+javac -cp "C:\Users\suhas\Documents\Code\Projects\IDtoIMG\scripts\lib\json-20240303.jar" emojisGrid.java
+(may get some deprecation warnings, but ignore)
+Run Code:
+java -cp "C:\Users\suhas\Documents\Code\Projects\IDtoIMG\scripts\lib\json-20240303.jar;." emojisGrid
 
-
-*/
+ */
