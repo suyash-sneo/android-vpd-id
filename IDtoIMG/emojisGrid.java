@@ -122,21 +122,3 @@ public class emojisGrid
         return emojis;
     }
 }
-/*
-
-PC:
-
-Compile Code:
-javac -cp "C:\Users\suhas\OneDrive\Documents\Code\Projects\IDtoIMG\scripts\lib\json-20240303.jar" emojisGrid.java
-Run Code:
-java -cp "C:\Users\suhas\OneDrive\Documents\Code\Projects\IDtoIMG\scripts\lib\json-20240303.jar;." emojisGrid
-
-Laptop:
-
-Compile Code:
-javac -cp "C:\Users\suhas\Documents\Code\Projects\IDtoIMG\scripts\lib\json-20240303.jar" emojisGrid.java
-(may get some deprecation warnings, but ignore)
-Run Code:
-java -cp "C:\Users\suhas\Documents\Code\Projects\IDtoIMG\scripts\lib\json-20240303.jar;." emojisGrid
-
- */
